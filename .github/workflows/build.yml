@@ -18,7 +18,7 @@ on:
         default: false
         required: false
   schedule:
-    - cron: '0 12 * * *'
+    - cron: '0 22 * * *'
 
 permissions:
   contents: write
@@ -36,7 +36,7 @@ jobs:
       - name: Repo Check
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          if [[ "$GITHUB_REPOSITORY" != "FFmpeg-Builds/FFmpeg-Builds" ]]; then
+          if [[ "$GITHUB_REPOSITORY" != "QuickFatHedgehog/FFmpeg-Builds-SVT-AV1-HDR" ]]; then
             echo "When forking this repository to make your own builds, you have to adjust this check."
             echo "When doing so make sure to randomize the scheduled cron time above, in order to spread out the various build times as much as possible."
             echo "This has been put in place due to the enormous amounts of traffic hundreds/thousands of parallel builds can cause on external infrastructure."
@@ -300,7 +300,7 @@ jobs:
       matrix:
         runner: [ubuntu-latest]
         target: [win64,winarm64,linux64,linuxarm64]
-        variant: [gpl,lgpl,gpl 8.1,gpl 9.0,lgpl 8.1,lgpl 9.0,gpl-shared,lgpl-shared,gpl-shared 8.1,gpl-shared 9.0,lgpl-shared 8.1,lgpl-shared 9.0]
+        variant: [gpl,gpl 8.1,gpl 9.0,gpl-shared,gpl-shared 8.1,gpl-shared 9.0]
         include:
           - runner: ubuntu-latest
             target: win64
@@ -435,7 +435,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [win64,winarm64,linux64,linuxarm64]
-        variant: [gpl,lgpl,gpl 8.1,gpl 9.0,lgpl 8.1,lgpl 9.0,gpl-shared,lgpl-shared,gpl-shared 8.1,gpl-shared 9.0,lgpl-shared 8.1,lgpl-shared 9.0]
+        variant: [gpl,gpl 8.1,gpl 9.0,gpl-shared,gpl-shared 8.1,gpl-shared 9.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
