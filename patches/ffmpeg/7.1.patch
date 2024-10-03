@@ -62,3 +62,38 @@ index 79b28eb4df..acdcb845d1 100644
      { "qp", "Initial Quantizer level value", OFFSET(qp),
        AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 63, VE },
      { "svtav1-params", "Set the SVT-AV1 configuration using a :-separated list of key=value parameters", OFFSET(svtav1_opts), AV_OPT_TYPE_DICT, { 0 }, 0, 0, VE },
+
+diff --git a/libavcodec/libsvtav1.c b/libavcodec/libsvtav1.c
+index 7a3048411d..c47ddb643b 100644
+--- a/libavcodec/libsvtav1.c
++++ b/libavcodec/libsvtav1.c
+@@ -125,7 +125,19 @@ static int alloc_buffer(EbSvtAv1EncConfiguration *config, SvtContext *svt_enc)
+ 
+     EbSvtIOFormat *in_data;
+ 
+-    svt_enc->raw_size = luma_size * 3 / 2;
++    switch (config->encoder_color_format) {
++    case EB_YUV420:
++        svt_enc->raw_size = luma_size * 3 / 2;
++        break;
++    case EB_YUV422:
++        svt_enc->raw_size = luma_size * 2;
++        break;
++    case EB_YUV444:
++        svt_enc->raw_size = luma_size * 3;
++        break;
++    default:
++        return AVERROR(EINVAL);
++    }
+ 
+     // allocate buffer for in and out
+     svt_enc->in_buf           = av_mallocz(sizeof(*svt_enc->in_buf));
+@@ -776,6 +788,8 @@ const FFCodec ff_libsvtav1_encoder = {
+                       FF_CODEC_CAP_AUTO_THREADS | FF_CODEC_CAP_INIT_CLEANUP,
+     .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P,
+                                                     AV_PIX_FMT_YUV420P10,
++                                                    AV_PIX_FMT_YUV444P,
++                                                    AV_PIX_FMT_YUV444P10,
+                                                     AV_PIX_FMT_NONE },
+     .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
+     .p.priv_class   = &class,
