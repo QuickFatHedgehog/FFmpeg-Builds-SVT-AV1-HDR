@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT_REPO="https://github.com/BlueSwordM/svt-av1-psyex.git"
-SCRIPT_COMMIT="e44e0a2f64089eec98f45a996d47f00ab9c531f2"
+SCRIPT_REPO="https://github.com/juliobbv-p/svt-av1-hdr.git"
+SCRIPT_COMMIT="f1d983c978459f4a4cd3dafba3ab27285bc0a365"
 
 ffbuild_enabled() {
     [[ $TARGET == win32 ]] && return -1
