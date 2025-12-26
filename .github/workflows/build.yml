@@ -22,6 +22,7 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
+  COMPILER: clang
 
 jobs:
   pre_check:

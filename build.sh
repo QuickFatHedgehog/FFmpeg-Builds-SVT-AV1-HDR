@@ -52,12 +52,23 @@ EOF
 
 [[ -t 1 ]] && TTY_ARG="-t" || TTY_ARG=""
 
+DOCKER_ARGS=()
+if [[ "$COMPILER" == "clang" ]]; then
+    DOCKER_ARGS+=(
+        -e CC="clang --target=\${FFBUILD_TOOLCHAIN}"
+        -e CXX="clang++ --target=\${FFBUILD_TOOLCHAIN}"
+        -e AR="llvm-ar"
+        -e NM="llvm-nm"
+        -e RANLIB="llvm-ranlib"
+    )
+fi
+
 PATCHES_MOUNT=""
 if [ -d "patches/ffmpeg" ]; then
     PATCHES_MOUNT="-v $PWD/patches:/patches"
 fi
 
-docker run --rm -i $TTY_ARG "${UIDARGS[@]}" -v "$PWD/ffbuild":/ffbuild $PATCHES_MOUNT -v "$BUILD_SCRIPT":/build.sh "$IMAGE" bash /build.sh
+docker run --rm -i $TTY_ARG "${UIDARGS[@]}" "${DOCKER_ARGS[@]}" -v "$PWD/ffbuild":/ffbuild $PATCHES_MOUNT -v "$BUILD_SCRIPT":/build.sh "$IMAGE" bash /build.sh
 
 if [[ -n "$FFBUILD_OUTPUT_DIR" ]]; then
     mkdir -p "$FFBUILD_OUTPUT_DIR"

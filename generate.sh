@@ -136,6 +136,14 @@ export TODF="Dockerfile"
 BASELAYER="base-layer"
 to_df "FROM ${REGISTRY}/${REPO}/base-${TARGET}:latest AS ${BASELAYER}"
 to_df "ENV TARGET=$TARGET VARIANT=$VARIANT REPO=$REPO ADDINS_STR=$ADDINS_STR"
+
+if [[ "$COMPILER" == "clang" ]]; then
+    to_df "ENV CC=\"clang --target=\${FFBUILD_TOOLCHAIN}\" \\"
+    to_df "    CXX=\"clang++ --target=\${FFBUILD_TOOLCHAIN}\" \\"
+    to_df "    AR=\"llvm-ar\" \\"
+    to_df "    NM=\"llvm-nm\" \\"
+    to_df "    RANLIB=\"llvm-ranlib\""
+fi
 to_df "COPY --link util/run_stage.sh /usr/bin/run_stage"
 
 for addin in "${ADDINS[@]}"; do
