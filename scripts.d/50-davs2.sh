@@ -26,10 +26,19 @@ ffbuild_dockerbuild() {
     )
 
     if [[ $TARGET == win* || $TARGET == linux* ]]; then
-        myconf+=(
-            --host="$FFBUILD_TOOLCHAIN"
-            --cross-prefix="$FFBUILD_CROSS_PREFIX"
-        )
+        if [[ "$CC" == *clang* ]]; then
+            myconf+=(
+                --cc="$CC"
+                --cxx="$CXX"
+                --ar="$AR"
+                --ranlib="$RANLIB"
+            )
+        else
+            myconf+=(
+                --host="$FFBUILD_TOOLCHAIN"
+                --cross-prefix="$FFBUILD_CROSS_PREFIX"
+            )
+        fi
     else
         echo "Unknown target"
         return -1
