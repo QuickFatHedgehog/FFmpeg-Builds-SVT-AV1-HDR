@@ -32,7 +32,7 @@ ffbuild_dockerbuild() {
     [[ $TARGET == winarm* ]] && return 0
 
     if [[ -z "$COMPILER_SYSROOT" ]]; then
-        COMPILER_SYSROOT="$(${CC} -print-sysroot)/usr/${FFBUILD_TOOLCHAIN}"
+        COMPILER_SYSROOT="$(${FFBUILD_TOOLCHAIN}-gcc -print-sysroot)/usr/${FFBUILD_TOOLCHAIN}"
     fi
 
     unset CC CXX LD AR CPP LIBS CCAS
