@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/juliobbv-p/svt-av1-hdr.git"
-SCRIPT_COMMIT="836d56b21db64b4d24642cc1d8056305dea56882"
+SCRIPT_COMMIT="84b3348462b8d2983e96c81fe56fbb0acb919abc"
 
 ffbuild_enabled() {
     [[ $TARGET == win32 ]] && return -1
