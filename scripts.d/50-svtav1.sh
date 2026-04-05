@@ -1,7 +1,8 @@
 #!/bin/bash
 
-SCRIPT_REPO="https://github.com/juliobbv-p/svt-av1-hdr.git"
-SCRIPT_COMMIT="ec5965099409c04d756dd2dc688b12cce69cc2c3"
+SCRIPT_REPO="https://github.com/Uranite/svt-av1-tritium.git"
+SCRIPT_BRANCH="lib"
+SCRIPT_COMMIT="c9b816ac4b546b714a3b3e71f5e604f0288e283a"
 
 ffbuild_enabled() {
     [[ $TARGET == win32 ]] && return -1
