@@ -20,7 +20,6 @@ ffbuild_depends() {
     echo vulkan
     echo amf
     echo aom
-    echo aribb24
     echo avisynth
     echo chromaprint
     echo dav1d
@@ -31,6 +30,7 @@ ffbuild_depends() {
     echo frei0r
     echo gme
     echo kvazaar
+    echo libaribb24
     echo libaribcaption
     echo libass
     echo libbluray
@@ -39,6 +39,7 @@ ffbuild_depends() {
     echo libmp3lame
     echo libopus
     echo libplacebo
+    echo libpng
     echo librist
     echo libssh
     echo libtheora
