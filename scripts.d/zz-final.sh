@@ -41,6 +41,7 @@ ffbuild_depends() {
     echo libplacebo
     echo libpng
     echo librist
+    echo librsvg
     echo libssh
     echo libtheora
     echo libvpx
