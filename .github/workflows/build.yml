@@ -361,9 +361,9 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="Auto-Build $RELDATE"
           TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')"
-          (cd artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
-          ./util/release_body.sh "$TAGNAME" artifacts/*.{zip,tar.xz} > release_body.md
-          gh release create "$TAGNAME" --target "master" --title "$NAME" --notes-file release_body.md artifacts/*.{zip,tar.xz} artifacts/checksums.*
+          (cd artifacts && sha256sum *.{7z,tar.xz} > checksums.sha256)
+          ./util/release_body.sh "$TAGNAME" artifacts/*.{7z,tar.xz} > release_body.md
+          gh release create "$TAGNAME" --target "master" --title "$NAME" --notes-file release_body.md artifacts/*.{7z,tar.xz} artifacts/checksums.*
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
         env:
@@ -374,11 +374,11 @@ jobs:
           shopt -s nullglob
           mkdir latest_artifacts worktmpdir
           sudo mount -o size=75%,uid="${UID}" -t tmpfs tmpfs ./worktmpdir
-          (cd worktmpdir && ../util/repack_latest.sh ../latest_artifacts ../artifacts/*.{zip,tar.xz})
-          (cd latest_artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
+          (cd worktmpdir && ../util/repack_latest.sh ../latest_artifacts ../artifacts/*.{7z,tar.xz})
+          (cd latest_artifacts && sha256sum *.{7z,tar.xz} > checksums.sha256)
           NAME="Latest Auto-Build (${{ steps.create_release.outputs.rel_date }})"
           TAGNAME="latest"
-          ./util/release_body.sh "$TAGNAME" latest_artifacts/*.{zip,tar.xz} > latest_body.md
+          ./util/release_body.sh "$TAGNAME" latest_artifacts/*.{7z,tar.xz} > latest_body.md
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
           sleep 15
           gh release create "$TAGNAME" --target "master" --title "$NAME" --notes-file latest_body.md latest_artifacts/*

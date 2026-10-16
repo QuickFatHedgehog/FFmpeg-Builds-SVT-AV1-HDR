@@ -45,6 +45,7 @@ for FILE in "$@"; do
     FNAME="$(basename "$FILE")"
     BASE="${FNAME%.zip}"
     BASE="${BASE%.tar.xz}"
+    BASE="${BASE%.7z}"
 
     TARGET=""
     for T in "${TARGETS[@]}"; do
