@@ -40,7 +40,7 @@ Every file corresponds to its respective package.
 
 * `./build.sh target variant [addin [addin] [addin] ...]`
 
-On success, the resulting zip file will be in the `artifacts` subdir.
+On success, the resulting archive will be in the `artifacts` subdir (`.7z` for Windows targets, `.tar.xz` for Linux targets).
 
 ### Targets, Variants and Addins
 
