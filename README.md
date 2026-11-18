@@ -19,6 +19,22 @@ Builds run daily at 22:00 UTC (or GitHubs idea of that time) and are automatical
 - The last 14 daily builds are kept.
 - The special "latest" build floats and provides consistent URLs always pointing to the latest build.
 
+## Updating SVT-AV1-HDR
+
+The SVT-AV1-HDR pin lives in `scripts.d/50-svtav1.sh` (`SCRIPT_REPO` + `SCRIPT_COMMIT`).
+
+The [Update SVT-AV1-HDR](.github/workflows/update-svt-av1-hdr.yml) workflow runs daily at 03:00 UTC. It follows the tip of [juliobbv-p/SVT-AV1-HDR](https://github.com/juliobbv-p/SVT-AV1-HDR) `main`, compiles that commit to make sure it still builds, commits the new pin, and dispatches the build workflow (pushes made with `GITHUB_TOKEN` do not trigger workflows on their own).
+
+Run it manually with a specific branch, tag, or commit:
+
+```
+./util/update_svtav1.sh                 # upstream main
+./util/update_svtav1.sh --ref v4.3.0    # a specific tag
+./util/update_svtav1.sh --dry-run       # show what would change
+```
+
+On Windows, `./util/update_svtav1.ps1 -Ref v4.3.0` wraps the same script.
+
 ## Package List
 
 For a list of included dependencies check the scripts.d directory.

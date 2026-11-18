@@ -1,0 +1,108 @@
+name: Update SVT-AV1-HDR
+
+on:
+  schedule:
+    # A few hours before the nightly build, so the pin is fresh when it runs.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Upstream branch, tag, or full commit (default: main)'
+        required: false
+        default: ''
+        type: string
+      validate:
+        description: 'Compile the new commit before pinning it'
+        type: boolean
+        default: true
+      release:
+        description: 'Publish a release after the rebuild'
+        type: boolean
+        default: true
+
+concurrency:
+  group: update-svt-av1-hdr
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  # Branch, tag, or commit to follow. "main" tracks upstream HEAD, the same
+  # policy Uranite/HandBrake-SVT-AV1-HDR uses. Set to a tag such as "v4.3.0"
+  # to pin releases instead.
+  SVT_AV1_HDR_REF: "main"
+
+jobs:
+  update:
+    name: Update pin
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Repo Check
+        if: ${{ github.event_name == 'schedule' && github.repository != 'QuickFatHedgehog/FFmpeg-Builds-SVT-AV1-HDR' }}
+        run: |
+          echo "Scheduled updates are disabled on forks. Run this workflow manually instead."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Resolve and pin
+        id: update
+        env:
+          UPSTREAM_REF: ${{ inputs.ref }}
+        run: |
+          ref="${UPSTREAM_REF:-$SVT_AV1_HDR_REF}"
+          args=()
+          [[ -n "$ref" ]] && args+=(--ref "$ref")
+          bash util/update_svtav1.sh "${args[@]}"
+
+      - name: Show diff
+        if: steps.update.outputs.changed == 'true'
+        run: git diff -- scripts.d/50-svtav1.sh
+
+      # Keep these flags in sync with ffbuild_dockerbuild in
+      # scripts.d/50-svtav1.sh. This catches renamed CMake options and
+      # compile errors before a broken pin lands on master.
+      - name: Validate
+        if: steps.update.outputs.changed == 'true' && (github.event_name == 'schedule' || inputs.validate)
+        env:
+          REPO: ${{ steps.update.outputs.repo }}
+          COMMIT: ${{ steps.update.outputs.commit }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y cmake nasm
+          git clone --filter=blob:none --no-checkout "$REPO" /tmp/svt-av1-hdr
+          git -C /tmp/svt-av1-hdr checkout --detach "$COMMIT"
+          cmake -S /tmp/svt-av1-hdr -B /tmp/svt-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_TESTING=OFF \
+            -DBUILD_APPS=OFF \
+            -DSVT_AV1_LTO=OFF
+          cmake --build /tmp/svt-build -j"$(nproc)"
+
+      - name: Commit and push
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts.d/50-svtav1.sh
+          git commit -m "SVT-AV1-HDR ${{ steps.update.outputs.version }}"
+          git push
+
+      # Pushes made with GITHUB_TOKEN do not start workflow runs, so start the
+      # build explicitly after the new pin is committed.
+      - name: Trigger build
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            release=true
+          else
+            release="${{ inputs.release }}"
+          fi
+          gh workflow run build.yml --ref "${{ github.ref_name }}" -F doRelease="$release"
