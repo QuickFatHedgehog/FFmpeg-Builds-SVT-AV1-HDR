@@ -6,7 +6,10 @@
 # different branch, tag, or full commit instead (e.g. --ref v4.3.0).
 #
 # Usage:
-#   util/update_svtav1.sh [--ref <branch|tag|commit>] [--dry-run]
+#   util/update_svtav1.sh [--ref <branch|tag|commit>] [--commit] [--push] [--dry-run]
+#
+#   --commit  Commit the updated pin as "SVT-AV1-HDR <version>"
+#   --push    Commit and push the current branch
 #
 # When GITHUB_OUTPUT is set, changed/commit/version/repo are written there
 # for the update-svt-av1-hdr workflow.
@@ -18,9 +21,11 @@ cd "$(dirname "$0")/.."
 SCRIPT="scripts.d/50-svtav1.sh"
 REF=""
 DRY_RUN=0
+DO_COMMIT=0
+DO_PUSH=0
 
 usage() {
-    sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -31,6 +36,15 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dry-run)
             DRY_RUN=1
+            shift
+            ;;
+        --commit)
+            DO_COMMIT=1
+            shift
+            ;;
+        --push)
+            DO_COMMIT=1
+            DO_PUSH=1
             shift
             ;;
         -h|--help)
@@ -104,6 +118,22 @@ if [[ "$COMMIT" != "$CURRENT" ]]; then
     fi
 else
     echo "Already up to date"
+fi
+
+if [[ "$DO_COMMIT" == "1" ]]; then
+    if [[ "$DRY_RUN" == "1" ]]; then
+        echo "Dry run: not committing"
+    elif [[ -z "$(git status --porcelain -- "$SCRIPT")" ]]; then
+        echo "Nothing to commit"
+    else
+        git add -- "$SCRIPT"
+        git commit -m "SVT-AV1-HDR $VERSION" -- "$SCRIPT"
+        echo "Committed $VERSION"
+        if [[ "$DO_PUSH" == "1" ]]; then
+            git push
+            echo "Pushed"
+        fi
+    fi
 fi
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then

@@ -30,6 +30,8 @@ Run it manually with a specific branch, tag, or commit:
 ```
 ./util/update_svtav1.sh                 # upstream main
 ./util/update_svtav1.sh --ref v4.3.0    # a specific tag
+./util/update_svtav1.sh --commit        # commit the updated pin
+./util/update_svtav1.sh --push          # commit and push
 ./util/update_svtav1.sh --dry-run       # show what would change
 ```
 

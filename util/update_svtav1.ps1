@@ -1,12 +1,14 @@
 # Windows wrapper around util/update_svtav1.sh.
 #
 # Usage:
-#   ./util/update_svtav1.ps1 [-Ref <branch|tag|commit>] [-DryRun]
+#   ./util/update_svtav1.ps1 [-Ref <branch|tag|commit>] [-Commit] [-Push] [-DryRun]
 #
 # Requires bash (Git for Windows provides it).
 
 param(
     [string]$Ref = "",
+    [switch]$Commit,
+    [switch]$Push,
     [switch]$DryRun
 )
 
@@ -27,6 +29,8 @@ if (-not $bash) {
 
 $bashArgs = @((Join-Path $PSScriptRoot "update_svtav1.sh"))
 if ($Ref) { $bashArgs += @("--ref", $Ref) }
+if ($Commit) { $bashArgs += "--commit" }
+if ($Push) { $bashArgs += "--push" }
 if ($DryRun) { $bashArgs += "--dry-run" }
 
 & $bash @bashArgs
